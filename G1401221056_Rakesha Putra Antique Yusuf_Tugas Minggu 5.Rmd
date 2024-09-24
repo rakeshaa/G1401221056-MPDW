@@ -1,0 +1,142 @@
+---
+title: "G1401221056_Rakesha_Stationeran"
+author: "Rakesha Putra Antique Yusuf"
+date: "2024-09-24"
+output: html_document
+---
+
+# Library
+```{r}
+library(ggplot2)
+library(tsibble)
+library(tseries)
+library(MASS)
+```
+# Data
+```{r}
+data <- readxl::read_xlsx("C:/Users/RAKESHA/Downloads/DATA CURAH HUJAN (MPDW) (1).xlsx")
+data
+data.ts <- ts(data$`Akumulasi Hujan`)
+data.ts
+mean(data.ts)
+```
+# Plot Time Series
+```{r}
+plot_stas <- data.ts |> as_tsibble() |> 
+  ggplot(aes(x = index, y = value)) + geom_line() + theme_bw() +
+  xlab("Obs") + ylab("Akumulasi Curah Hujan")
+plot_stas
+```
+Plot deret waktu di atas menunjukkan bahwa data cenderung tidak stasioner dalam rataan, ditandai dengan data yang tidak menyebar di sekitar nilai tengahnya yaitu 25.3859, dan juga plot tersebut menunjukan indikasi data tidak stasioner dalam ragam, ditandai dengan lebar pita yang sangat berbeda.
+
+# Plot ACF
+```{r}
+acf(data.ts)
+```
+Berdasarkan plot ACF, terlihat bahwa plot ACF pada data tersebut cenderung tails off.
+
+# ADF
+```{r}
+adf.test(data.ts)
+```
+H0: Data tidak stationer dalam Rataan
+H1: Data stationer dalam rataan
+P-value < 0.05 menunjukan terdapat cukup bukti untuk menyimpulkan bahwa data stationer dalam rataan
+
+# Plot Box-Cox
+```{r}
+index <- seq(1:121)
+bc = boxcox(data.ts~index, lambda = seq(-0.2,0.2,by=0.1))
+```
+```{r}
+lambda <- bc$x[which.max(bc$y)]
+lambda
+```
+```{r}
+bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)]
+```
+Pada plot box-cox di atas menunjukkan rounded value (λ) optimum sebesar 0.022 dan pada selang kepercayaan 95% nilai memiliki batas bawah -0.384 dan batas atas 0.789. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data keseluruhan tidak stasioner dalam ragam.
+
+# Partisi Data 1-50
+```{r}
+data1 <- data.ts[1:50] |> ts()
+mean(data1)
+```
+## Plot Time Series
+```{r}
+data1 |> as_tsibble() |> 
+  ggplot(aes(x = index, y = value)) +
+  geom_line() + theme_bw() +
+  xlab("Obs") + ylab("Akumulasi Curah Hujan")
+```
+Plot time series menunjukkan bahwa data tidak stasioner dalam rataan, ditandai dengan data yang cenderung menaik. Namun, data stasioner dalam ragam, ditandai dengan lebar pita yang cenderung sama.
+
+## ACF
+```{r}
+acf(data1)
+```
+Berdasarkan plot ACF, terlihat bahwa plot ACF pada data tersebut cenderung tails off.
+
+## ADF Test
+```{r}
+adf.test(data1)
+```
+H0: Data tidak stationer dalam Rataan
+H1: Data stationer dalam rataan
+P-value > 0.05 menunjukan tidak terdapat cukup bukti untuk menyimpulkan bahwa data stationer dalam rataan atau kata lain data tersebut tidak stationer dalam rataan
+
+## Plot Box-Cox
+```{r}
+index <- seq(1:50)
+bc = boxcox(data1~index, lambda = seq(-0.3,0.5,by=0.1))
+```
+```{r}
+lambda <- bc$x[which.max(bc$y)]
+lambda
+```
+```{r}
+bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)]
+```
+Pada plot box-cox di atas menunjukkan rounded value (λ) optimum sebesar 0.0313 dan pada selang kepercayaan 95% nilai memiliki batas bawah -0.0818 dan batas atas 0.144. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data keseluruhan tidak stasioner dalam ragam.
+
+# Partisi Data 51-100
+```{r}
+data2 <- data.ts[51:100] |> ts()
+mean(data2)
+```
+## Plot Time Series
+```{r}
+data2 |> as_tsibble() |> 
+  ggplot(aes(x = index, y = value)) +
+  geom_line() + theme_bw() +
+  xlab("Obs") + ylab("Akumulasi Curah Hujan")
+```
+Plot time series menunjukkan bahwa data tidak stasioner dalam rataan, ditandai dengan data yang cenderung menaik. Namun, data stasioner dalam ragam, ditandai dengan lebar pita yang cenderung sama.
+
+## ACF
+```{r}
+acf(data2)
+```
+Berdasarkan plot ACF, terlihat bahwa plot ACF pada data tersebut cenderung tails off.
+
+## ADF Test
+```{r}
+adf.test(data2)
+```
+H0: Data tidak stationer dalam Rataan
+H1: Data stationer dalam rataan
+P-value > 0.05 menunjukan tidak terdapat cukup bukti untuk menyimpulkan bahwa data stationer dalam rataan atau kata lain data tersebut tidak stationer dalam rataan
+
+## Plot Box-Cox
+```{r}
+index <- seq(51:100)
+bc = boxcox(data1~index, lambda = seq(-0.3,0.5,by=0.1))
+```
+```{r}
+lambda <- bc$x[which.max(bc$y)]
+lambda
+```
+```{r}
+bc$x[bc$y > max(bc$y) - 1/2 * qchisq(.95,1)]
+```
+Pada plot box-cox di atas menunjukkan rounded value (λ) optimum sebesar 0.209 dan pada selang kepercayaan 95% nilai memiliki batas bawah 0.112 dan batas atas 0.322. Selang tersebut tidak memuat nilai satu sehingga dapat dikatakan bahwa data keseluruhan tidak stasioner dalam ragam.
